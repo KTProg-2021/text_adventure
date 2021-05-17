@@ -22,6 +22,14 @@ class Item
         set { _description = value != null ? value : _description; }
     }
 
+    //ART
+    private string _art = "";
+    public string Art
+    {
+        get { return _art; }
+        set { _art = value != null ? value : _art; }
+    }
+
     //BUILDER
     public Item(string name, string description)
     {
