@@ -174,12 +174,12 @@ namespace Game_Project
                         break;
                     default: Console.WriteLine("Not good :("); break;
                 }
-                if (map.X == 2 && map.Y == 1)
+                if (map.X == 2 && map.Y == 1 && continuie)
                 {
                     Combat(enemies("elemental"));
                     map.print();
                 }
-                if (map.X == 0 && map.Y == 2)
+                if (map.X == 0 && map.Y == 2 && continuie)
                 {
                     Combat(enemies("bear"));
                     map.print();
