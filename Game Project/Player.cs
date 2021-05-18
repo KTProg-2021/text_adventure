@@ -24,10 +24,10 @@ class Player
 
     //KILLS
     private int[] _bounty;
-    public int Bounty
+    public int[] Bounty
     {
-        get { return _hp; }
-        set { _hp = value; }
+        get { return _bounty; }
+        set { _bounty = value; }
     }
 
     private Weapon _wep;
@@ -87,5 +87,6 @@ class Player
         Name = "Player";
         Health = 100;
         Inventory = new Dictionary<Item, int>();
+        Bounty = new int[3];
     }
 }

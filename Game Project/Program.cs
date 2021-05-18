@@ -8,7 +8,6 @@ namespace Game_Project
 {
     public enum Direction
     {
-        //directions
         North,
         West,
         South,
@@ -61,10 +60,26 @@ namespace Game_Project
             enemyArray.Add("ent", new Enemy("Ent", "The telepathic and wise tree creature residing in the forest who has high speed and low attack", 5, 15, 10, 5, "forest"));
             enemyArray.Add("minotaur", new Enemy("Minotaur", "The gruff and angry man bull lost in the ruins who has high defense and low speed", 5, 15, 10, 5, "ruins"));
             enemyArray.Add("leon2", new Enemy("Leon", "lelon dead lol", 10, 10, 10, 6, "fortress"));
+            enemyArray["bees"].Art = "\n     (\\\\ \n    -###) \n      \"\"   //) \n   (\\\\    (###- \n  -###)    \"\" \n    \"\"";
             enemyArray["bear"].Art = "\n      ____________________________             _\n    /                             \\        __ | | __\n   |                               \\_____ /      _ \\\n   |                                             .  \\\n  _|                                                 \\_\n |                                               _____ |\n |_                                                \\/__|\n   |                                 _____          /\n   |                                /     \\_______ /\n   |         ____________          /\n    \\       /            \\        /\n     |     |               |     |\n     |     |               |     |\n     | ______\\             | ______\\";
             enemyArray["elemental"].Art = "\n  * /\\ /\\ \n/\\ //\\\\\\/ \n\\///  _\\  \n  \\\\ / \\  \n <>\\\\\\_/ \n    \\/ *";
+            enemyArray["goblin"].Art = "\n  _ _ \n<(\'Δ\')> \n`-(_)-, \n  / \\";
             return enemyArray[enemy];
         }
+
+        //ITEM BANK
+        static public Npc npcs(string item)
+        {
+            Dictionary<string, Npc> npcArray = new Dictionary<string, Npc>();
+            npcArray.Add("leon", new Npc("Leon", "Young adult male. Your childhood friend and training buddy."));
+            npcArray.Add("captain", new Npc("Captain", "Middle aged male. He seems mature and formal but a bit weary."));
+            npcArray.Add("hinter", new Npc("Hinter", "Elder person. They are mysterious and wise. They know more than they let on..."));
+            npcArray.Add("spirit", new Npc("Water Spirit", "Female spirit. She's sassy and mysterious and seems to be looking for something."));
+            npcArray.Add("spirit", new Npc("Water Spirit", "Female spirit. She's sassy and mysterious and seems to be looking for something."));
+
+            return npcArray[item];
+        }
+
 
         //MAKE CHOICE
         static public int Choice(string[] choices)
@@ -80,8 +95,8 @@ namespace Game_Project
                 }
                 System.Threading.Thread.Sleep(500);
                 int outp = 0;
-                try { outp = Convert.ToInt32(Console.ReadLine()); Console.WriteLine();}
-                catch (FormatException e) { Console.WriteLine(); outp = Choice(choices); }
+                try { outp = Convert.ToInt32(Console.ReadLine()); Console.WriteLine(); }
+                catch (FormatException) { Console.WriteLine(); outp = Choice(choices); }
                 if (outp <= 0 || outp > choices.Length) { outp = Choice(choices); }
                 return outp;
             }
@@ -89,7 +104,7 @@ namespace Game_Project
         }
 
         //COMBAT
-        static public void Combat(Enemy enemy)
+        static public int Combat(Enemy enemy)
         {
             Console.WriteLine("A{0} {1} approaches", enemy.Name.ToLower()[0] == 'a' || enemy.Name.ToLower()[0] == 'e' ||
                                                         enemy.Name.ToLower()[0] == 'i' || enemy.Name.ToLower()[0] == 'o' ||
@@ -137,15 +152,17 @@ namespace Game_Project
                 }
                 timer++;
             }
-            if (player.Health < 1) Console.WriteLine("{0} Died", player.Name);
-            else if (enemy.Health < 1) Console.WriteLine("{0} Died", enemy.Name);
+            if (player.Health < 1) { Console.WriteLine("{0} Died", player.Name); return 0; }
+            else if (enemy.Health < 1) { Console.WriteLine("{0} Died", enemy.Name); return 1; }
+            else if (ran) { return 2; }
+            else return 3;
         }
         
         static void Main(string[] args)
         {
             Console.Write("What's your name?\n");
             player.Name = Console.ReadLine();
-            player.Weapon = (Weapon)items("bigboy");
+            player.Weapon = (Weapon)items("sword");
             Map map = new Map(5, 5);
             map.initialize();
             map.X = 2; map.Y = 2;
