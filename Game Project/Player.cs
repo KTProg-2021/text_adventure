@@ -69,12 +69,21 @@ class Player
     {
         if (HasItem(item)) Inventory[item]++; else Inventory.Add(item, 1);
     }
+    public void PickUpItem(Item item, int count)
+    {
+        for (int i = 0; i < count; i++) PickUpItem(item);
+    }
     public void DropItem(Item item)
     {
-        if (HasItem(item)) if (Inventory[item]>1) Inventory[item]--; else Inventory.Remove(item);
+        if (HasItem(item)) if (Inventory[item] > 1) Inventory[item]--; else Inventory.Remove(item);
+    }
+    public void DropItem(Item item, int count)
+    {
+        for (int i = 0; i < count; i++) DropItem(item);
     }
     public void PrintInv()
     {
+        if (Inventory.Count>0)
         foreach (KeyValuePair<Item, int> kvp in Inventory)
         {
             Console.WriteLine("{0}*{1}", kvp.Value, kvp.Key);

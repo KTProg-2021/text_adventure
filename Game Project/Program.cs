@@ -23,7 +23,7 @@ namespace Game_Project
         static public Item items(string item)
         {
             Dictionary<string, Item> itemArray = new Dictionary<string, Item>();
-            itemArray.Add("staff", new Weapon("Training Staff", "A small staff with high attack and low defense", 8, 8, 8));
+            itemArray.Add("staff", new Weapon("Training Staff", "A small staff with high attack and low defense", 99, 99, 5));
             itemArray.Add("wood_axe", new Weapon("Woodcutter's Axe", "A small axe with high defense and low speed", 8, 12, 3));
             itemArray.Add("sword", new Weapon("Sword", "A strong sword with high attack and low defense", 15, 5, 10));
             itemArray.Add("axe", new Weapon("Axe", "A large axe with high defense and low speed", 10, 15, 5));
@@ -86,6 +86,13 @@ namespace Game_Project
             npcArray.Add("hinter", new Npc("Sonal", "The Hinter. Elder person. They are mysterious and wise. They know more than they let on..."));
             npcArray.Add("guard", new Npc("Konrad", "The Town Guard Leader. Adult man. He was born to be a leader."));
             npcArray.Add("alchemist", new Npc("Andrea", "The Alchemist. Middle aged woman. She is friendly and welcoming. She sells healing items and potions."));
+                npcArray["alchemist"].Trades.Add(items("bandage"), 5);
+                npcArray["alchemist"].Trades.Add(items("lesser_heal"), 10);
+                npcArray["alchemist"].Trades.Add(items("greater_heal"), 20);
+                npcArray["alchemist"].Trades.Add(items("atk_pot"), 30);
+                npcArray["alchemist"].Trades.Add(items("def_pot"), 30);
+                npcArray["alchemist"].Trades.Add(items("spd_pot"), 30);
+                npcArray["alchemist"].Trades.Add(items("bounty_pot"), 50);
             npcArray.Add("blacksmith", new Npc("Owen", "The Blacksmith. Middle aged man. He is gruff and concise. He sells weapons and other gear."));
 
             return npcArray[item];
@@ -171,6 +178,34 @@ namespace Game_Project
             else return 3;
         }
 
+        //SHOP
+        static public void Shop(Npc npc)
+        {
+            Say("Welcome to "+ npc.Name + "\'s shop! What would you like to buy?");
+            string[] Trades = new string[npc.Trades.Count+1];
+            Trades[0] = "Exit Shop";
+            for(int i = 0; i < npc.Trades.Count; i++)
+            {
+                Trades[i+1] = npc.Trades.ElementAt(i).Value+"g: "+npc.Trades.ElementAt(i).Key.Name;
+            }
+            int choice = 0;
+            while (choice != 1)
+            {
+                choice = Choice(Trades);
+                if (choice != 1)
+                {
+                    Item item = npc.Trades.ElementAt(choice - 1).Key;
+                    if (player.HasItem(items("coin"), npc.Trades[item]))
+                    {
+                        player.PickUpItem(item);
+                        player.DropItem(items("coin"), npc.Trades[item]);
+                        Say("You now have " + player.Inventory[items("coin")] + " coins");
+                    }
+                    else Say("You only have " + player.Inventory[items("coin")] + " coins");
+                }
+            }
+        }
+
         #region MAPS
         static public Map TownMap()
         {
@@ -197,6 +232,10 @@ namespace Game_Project
             map.pieceDirection(4, 0, Direction.East, false);
             map.pieceDirection(4, 1, Direction.East, false);
             map.pieceDirection(4, 1, Direction.South, false);
+
+            map.pieceDirection(5, 8, Direction.East, false);
+            map.pieceDirection(5, 9, Direction.East, false);
+            map.pieceDirection(5, 10, Direction.East, false);
 
             map.pieceDirection(8, 0, Direction.West, false);
             map.pieceDirection(8, 1, Direction.West, false);
@@ -626,7 +665,7 @@ namespace Game_Project
         static public void Walk(ref Map map)
         {
             Console.WriteLine("\nWhich way would you like to go?");
-            switch (Choice(new string[] { "North", "East", "South", "West"}))
+            switch (Choice(new string[] { "North", "East", "South", "West", "Show Inventory" }))
             {
                 case 1:
                     map.Move(Direction.North);
@@ -640,6 +679,9 @@ namespace Game_Project
                 case 4:
                     map.Move(Direction.West);
                     break;
+                case 5:
+                    player.PrintInv();
+                    break;
                 default: Say("Something went wrong! </3"); break;
             }
         }
@@ -649,18 +691,20 @@ namespace Game_Project
             Map[] maps = new Map[] { TownMap(), RuinsMap(), ForestMap(), LakeMap(), GateMap(), Fortress1Map(), Fortress2Map(), Fortress3Map() }; 
             Map map;
 
-            //Say("\"What a great morning,\" you think to yourself.");
-            //Say("As you sip your tea, a letter slides under your door.");
-            //Say("You pick it up and open it. It reads:\n");
-            //Say("      Hey, friend!");
-            //Say("  Training yesterday was really fun. I'm looking\n" +
-            //    "  forward to it today! The town guard leader said \n" +
-            //    "  that he has some exciting news for us today. I\n" +
-            //    "  hope everything goes well. Meet me at the Training\n" +
-            //    "  Grounds asap. See you soon!");
-            //Say("      Regards, Leon\n");
-            //Say("You look at the clock.");
-            //Say("\"Oh no, it's almost time for training to start!\" you say to yourself.");
+            Console.Write("press any key to start "); Console.ReadKey();
+
+            Say("What a great morning,\" you think to yourself.");
+            Say("As you sip your tea, a letter slides under your door.");
+            Say("You pick it up and open it. It reads:\n");
+            Say("     \"Hey, friend!");
+            Say("  Training yesterday was really fun. I'm looking\n" +
+                "  forward to it today! The town guard leader said \n" +
+                "  that he has some exciting news for us today. I\n" +
+                "  hope everything goes well. Meet me at the Training\n" +
+                "  Grounds asap. See you soon!");
+            Say("      Regards, Leon\"\n");
+            Say("You look at the clock.");
+            Say("\"Oh no, it's almost time for training to start!\" you say to yourself.");
             Say("You finish your tea and rush out the door.\n");
             System.Threading.Thread.Sleep(500);
 
@@ -681,7 +725,7 @@ namespace Game_Project
             Say("\"Hello future town guards. How is everyone today?\" says a loud voice from the front of the training grounds.");
             Say("\"Good, sir,\" everyone responds.");
             Say("\"To of you who may not know, I am Konrad. I lead the town guard and this is my training class.\"");
-            Say("\"Today will have the same schedule as yesterday. To start we will all partner up and practice combat. Everyone find a partner.\"");
+            Say("\"Today will have the same schedule as yesterday. To start we will all partner up and practice combat.\nEveryone find a partner.\"");
             Say("He goes around the training grounds and make sure that everyone has a partner. He walks up to you and Leon.");
             Say("\"Are you two partners?\" he asks.");
             Say("\"Yes, sir,\" Leon responds.");
@@ -691,12 +735,14 @@ namespace Game_Project
             Say("\n\"" + player.Name + ". My name is " + player.Name + ",\" you say.");
             Say("\"Thank you, " + player.Name + ". I believe that is everyone. Let the combat commence,\" he says.");
             Say("Both you and Leon take out your training staffs and start.");
-            player.Weapon = (Weapon) items("staff");
+            player.PickUpItem(items("staff"));
+            player.Weapon = (Weapon)items("staff");
             Combat(enemies("leon1"));
             Say("You slip and you accidentally pierce Leon's chest with your training staff.");
             Say("\"OH MY GOD LEON I'M SO SORRY,\" you cry to him.");
             Say("\"QUICK, RUN TO THE ALCHEMIST'S SHOP AND BUY SOME BANDAGES AND HEALING POTIONS,\" Konrad yells at you.");
-            Say("You rush off the Training Grounds to the Alchemist's Shop.\n");
+            Say("He hands you some money and you rush off the Training Grounds to the Alchemist's Shop.\n");
+            player.PickUpItem(items("coin"), 15);
             System.Threading.Thread.Sleep(500);
 
             map.X = 6; map.Y = 7;
@@ -706,10 +752,35 @@ namespace Game_Project
             while (true)
             {
                 Walk(ref map);
-                if (map.X ==3 && map.Y == 2) break;
+                if (map.X == 3 && map.Y == 1) break;
             }
 
             Say("\nYou arrive at the Alchemist's Shop");
+            Say("You run through the door and say to the Alchemist behind the counter,\n\"My friend got hurt. I need some bandages or healing potions.\"");
+            Say("\"Oh I'm so sorry! Well, I have a great selection of items right here. My name is Andrea, by the way,\" she responds.");
+
+            //Shop(npcs("alchemist"));
+            player.PickUpItem(items("bandage"));
+            player.PickUpItem(items("lesser_heal"));
+
+            Say("She gives you a Bandage and and a Lesser Healing Potion");
+            Say("\"Thank you so much,\" you say.");
+            Say("\"Any time!\" she responds.");
+            Say("You rush back to the Training Grounds\n");
+
+            map.X = 3; map.Y = 2;
+            map.print();
+            Say("\nYou're northwest of the Training Grounds.");
+
+            while (true)
+            {
+                Walk(ref map);
+                if (map.X > 5 && map.X < 10 && map.Y > 7) break;
+            }
+
+            Say("\nYou arrive at the training grounds.");
+            Say("\"You were too late. He's gone, "+player.Name+",\" Konrad says to you.");
+
             Say("\nSorry the demo is over lol");
         }
     }
@@ -900,6 +971,7 @@ namespace Game_Project
                         {
                             cells[i, j].East = cells[i, j + 1];
                         }
+                        makeMap(cells[i, j]);
                     }
                 }
             }
@@ -995,24 +1067,43 @@ namespace Game_Project
                         break;
                 }
                 if (cells[y, x].Trigger) this.GetType().GetMethod(cells[y, x].Event).Invoke(this, null); ;
-            }
+        }
         public void print()
+        {
+            cells[Y, X].Data = model;
+            if (_show)
             {
-                cells[Y, X].Data = model;
-                if (_show)
+                for (int i = 0; i < cells.GetLength(0); i++)
                 {
-                    for (int i = 0; i < cells.GetLength(0); i++)
+                    for (int j = 0; j < cells.GetLength(1); j++)
                     {
-                        for (int j = 0; j < cells.GetLength(1); j++)
-                        {
-                            Console.Write(cells[i, j].Data);
-                        }
-                        Console.WriteLine("");
+                        if (i == Y && j == X) Console.Write(model);
+                        else Console.Write(makeMap(cells[i, j]));
+                        if (cells[i, j].East != null) Console.Write('═'); else Console.Write(' ');
                     }
-
+                    Console.WriteLine("");
                 }
 
             }
+
+        }
+        public void print(int x)
+        {
+            cells[Y, X].Data = model;
+            if (_show)
+            {
+                for (int i = 0; i < cells.GetLength(0); i++)
+                {
+                    for (int j = 0; j < cells.GetLength(1); j++)
+                    {
+                        Console.Write(cells[i, j].Data);
+                    }
+                    Console.WriteLine("");
+                }
+
+            }
+
+        }
         public void reveal()
             {
                 cells[Y, X].Data = model;
