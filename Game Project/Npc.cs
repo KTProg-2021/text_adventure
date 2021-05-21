@@ -37,4 +37,12 @@ class Npc
         Description = description;
         Trades = new Dictionary<Item, int>();
     }
+
+    //BUILDER
+    public Npc(string name, string description, Dictionary<Item, int> trades)
+    {
+        Name = name;
+        Description = description;
+        Trades = trades;
+    }
 }
