@@ -83,11 +83,12 @@ class Player
     }
     public void PrintInv()
     {
-        if (Inventory.Count>0)
-        foreach (KeyValuePair<Item, int> kvp in Inventory)
-        {
-            Console.WriteLine("{0}*{1}", kvp.Value, kvp.Key);
-        }
+        if (Inventory.Count > 0)
+            foreach (KeyValuePair<Item, int> kvp in Inventory)
+            {
+                Console.WriteLine("{0}*{1}", kvp.Value, kvp.Key);
+            }
+        else Console.WriteLine("Your inventory is empty");
     }
 
     //BUILDER

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -126,20 +127,20 @@ namespace Game_Project
             Console.WriteLine("A{0} {1} approaches", enemy.Name.ToLower()[0] == 'a' || enemy.Name.ToLower()[0] == 'e' ||
                                                         enemy.Name.ToLower()[0] == 'i' || enemy.Name.ToLower()[0] == 'o' ||
                                                         enemy.Name.ToLower()[0] == 'u' ? "n" : "", enemy.Name);
-            Console.WriteLine(enemy.Art+"\n");
+            Console.WriteLine(enemy.Art + "\n");
             System.Threading.Thread.Sleep(500);
             int action = 0;
             int timer = 1;
-            while (enemy.Health > 0 && player.Health > 0 && action<4)
+            while (enemy.Health > 0 && player.Health > 0 && action < 4)
             {
-                if ( player.Weapon.Speed % timer == 0 )
+                if (player.Weapon.Speed % timer == 0)
                 {
                     Console.WriteLine("{0}'{1} health: {2} | {3}'{4} health: {5}", player.Name, player.Name[0] != 's' ? 's' : "", player.Health, enemy.Name, enemy.Name[0] != 's' ? 's' : "", enemy.Health);
                     System.Threading.Thread.Sleep(500);
                     switch (Choice(new string[] { "Attack", "Defend", "Inspect", "Run" }))
                     {
                         case 1:
-                            int atk = Math.Max(player.Weapon.Attack - (int)(enemy.Defense/2), 0);
+                            int atk = Math.Max(player.Weapon.Attack - (int)(enemy.Defense / 2), 0);
                             enemy.Health -= atk;
                             Console.WriteLine("{0} did {1} damage", player.Name, atk);
                             action = 1;
@@ -160,7 +161,7 @@ namespace Game_Project
                     Console.WriteLine();
                     System.Threading.Thread.Sleep(500);
                 }
-                if (enemy.Health > 0 && enemy.Speed % timer == 0 )
+                if (enemy.Health > 0 && enemy.Speed % timer == 0)
                 {
                     Console.WriteLine("{0}'{1} health: {2} | {3}'{4} health: {5}", player.Name, player.Name[0] != 's' ? 's' : "", player.Health, enemy.Name, enemy.Name[0] != 's' ? 's' : "", enemy.Health);
                     Console.WriteLine("{0} attacked", enemy.Name);
@@ -174,7 +175,58 @@ namespace Game_Project
             }
             if (player.Health < 1) { Console.WriteLine("{0} Died", player.Name); return 0; }
             else if (enemy.Health < 1) { Console.WriteLine("{0} Died", enemy.Name); return 1; }
-            else if (action==4) { return 2; }
+            else if (action == 4) { return 2; }
+            else return 3;
+        }
+        static public int IntroCombat()
+        {
+            Enemy enemy = enemies("leon1");
+            Console.WriteLine(enemy.Name+" approaches");
+            Console.WriteLine(enemy.Art + "\n");
+            System.Threading.Thread.Sleep(500);
+            int action = 0;
+            int timer = 1;
+            while (enemy.Health > 0 && player.Health > 0 && action < 4)
+            {
+                if (player.Weapon.Speed % timer == 0)
+                {
+                    Console.WriteLine("{0}'{1} health: {2} | {3}'{4} health: {5}", player.Name, player.Name[0] != 's' ? 's' : "", player.Health, enemy.Name, enemy.Name[0] != 's' ? 's' : "", enemy.Health);
+                    System.Threading.Thread.Sleep(500);
+                    switch (Choice(new string[] { "Attack", "Defend", "Inspect" }))
+                    {
+                        case 1:
+                            int atk = Math.Max(player.Weapon.Attack - (int)(enemy.Defense / 2), 0);
+                            enemy.Health -= atk;
+                            Console.WriteLine("{0} did {1} damage", player.Name, atk);
+                            action = 1;
+                            break;
+                        case 2:
+                            Console.WriteLine("{0} defended", player.Name);
+                            action = 2;
+                            break;
+                        case 3:
+                            Console.WriteLine("{0}: {1}", enemy.Name, enemy.Description);
+                            action = 3;
+                            break;
+                    }
+                    Console.WriteLine();
+                    System.Threading.Thread.Sleep(500);
+                }
+                if (enemy.Health > 0 && enemy.Speed % timer == 0)
+                {
+                    Console.WriteLine("{0}'{1} health: {2} | {3}'{4} health: {5}", player.Name, player.Name[0] != 's' ? 's' : "", player.Health, enemy.Name, enemy.Name[0] != 's' ? 's' : "", enemy.Health);
+                    Console.WriteLine("{0} attacked", enemy.Name);
+                    System.Threading.Thread.Sleep(500);
+                    int atk = Math.Max(enemy.Attack - (int)(action == 2 ? player.Weapon.Defense : player.Weapon.Defense / 2), 0);
+                    player.Health -= atk;
+                    Console.WriteLine("{0} took {1} damage", player.Name, atk);
+                    System.Threading.Thread.Sleep(500);
+                }
+                timer++;
+            }
+            if (player.Health < 1) { Console.WriteLine("{0} Died", player.Name); return 0; }
+            else if (enemy.Health < 1) { Console.WriteLine("{0} Died", enemy.Name); return 1; }
+            else if (action == 4) { return 2; }
             else return 3;
         }
 
@@ -691,7 +743,8 @@ namespace Game_Project
             Map[] maps = new Map[] { TownMap(), RuinsMap(), ForestMap(), LakeMap(), GateMap(), Fortress1Map(), Fortress2Map(), Fortress3Map() }; 
             Map map;
 
-            Console.Write("press any key to start "); Console.ReadKey();
+            #region INTRO
+            Console.Write("press enter to start "); Console.ReadKey();
 
             Say("What a great morning,\" you think to yourself.");
             Say("As you sip your tea, a letter slides under your door.");
@@ -738,11 +791,17 @@ namespace Game_Project
             player.PickUpItem(items("staff"));
             player.Weapon = (Weapon)items("staff");
             Combat(enemies("leon1"));
+
+            //PLAY LEON SOUND
+
             Say("You slip and you accidentally pierce Leon's chest with your training staff.");
             Say("\"OH MY GOD LEON I'M SO SORRY,\" you cry to him.");
-            Say("\"QUICK, RUN TO THE ALCHEMIST'S SHOP AND BUY SOME BANDAGES AND HEALING POTIONS,\" Konrad yells at you.");
+            Say("\"QUICK, RUN TO THE ALCHEMIST'S SHOP AND BUY SOME BANDAGES AND HEALING POTIONS,\" Konrad yells at you. This makes you drop your staff.");
+            player.DropItem(items("staff"));
+            player.Weapon = null;
             Say("He hands you some money and you rush off the Training Grounds to the Alchemist's Shop.\n");
             player.PickUpItem(items("coin"), 15);
+
             System.Threading.Thread.Sleep(500);
 
             map.X = 6; map.Y = 7;
@@ -760,8 +819,6 @@ namespace Game_Project
             Say("\"Oh I'm so sorry! Well, I have a great selection of items right here. My name is Andrea, by the way,\" she responds.");
 
             //Shop(npcs("alchemist"));
-            player.PickUpItem(items("bandage"));
-            player.PickUpItem(items("lesser_heal"));
 
             Say("She gives you a Bandage and and a Lesser Healing Potion");
             Say("\"Thank you so much,\" you say.");
@@ -779,9 +836,40 @@ namespace Game_Project
             }
 
             Say("\nYou arrive at the training grounds.");
-            Say("\"You were too late. He's gone, "+player.Name+",\" Konrad says to you.");
-
+            Say("\"You were too late. He's gone, " + player.Name + ",\" Konrad says to you.");
+            Say("\"Class is over early everyone. Head home.\"");
+            Say("\"Wait! The boy! I can help the boy!\" you hear an old voice call from far behind you.");
+            Say("\"Who said that?\" you turn around, confused.");
+            Say("\"I did,\" the voice says now right behind you.");
+            Say("You turn around, now startled. Right in front of you is the Hinter.");
+            Say("\"Hello, I am Sonal, the Hinter. I can bring the boy back. Leon, I mean,\" they say.");
+            Say("\"The Hin- wait you can bring him back to life?!\" you ask.");
+            Say("\"Well, yes,\" they say. \"I can help him. If you trust me with him, I can assure that you will get your friend back.\"");
+            Say("\"How do I know I can trust you?\" you say suspiciously.");
+            Say("\"Believe me,\" they respond. \"I am the only person who can do this. I will bring your friend back.\"");
+            Say("\".\b..\b..\b.Okay. I trust you. Please just help him.\" You hand Sonal Leon's lifeless body and turn away.");
+            Say("\"You won't regret this. Thank you, "+player.Name+".\" they say to you.");
+            Say("\"Wait I never told you my na-\" You turn around but Sonal and Leon's body have disappeared.");
+            System.Threading.Thread.Sleep(500);
+            Say("\nYou make your way back home and vow to yourself that you will never wield a weapon again.");
+            System.Threading.Thread.Sleep(1000);
+            Say("\nthe next morning you wake up with your mind on what you did to leon. You can't shake it from your conscience.");
+            Say("\nAs you go downstairs and make your way to the kitchen, you notice a letter slid in under your door. It reads:\n");
+            Say("     \""+player.Name+",");
+            Say("  I apologise for the events of yesterday. Things got\n" +
+                "  out of hand and I'm sure you need some time to take \n" +
+                "  it all in, so training today has been cancelled. This\n" +
+                "  being said, I need your help with something. A  \n" +
+                "  mysterious storm has appeared above the Fortress near\n" +
+                "  our town. I need someone to check it out, and you are\n" +
+                "  are the only guard in training capable enough to make\n" +
+                "  your way to the top. You'll need to stop by the\n" +
+                "  Blacksmith before you head off. He will tell you more.");
+            Say("      Regards, Konrad\"\n");
+            Say("Cringechamp.");
             Say("\nSorry the demo is over lol");
+
+            #endregion
         }
     }
     class Cell
